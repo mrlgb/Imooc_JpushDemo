@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="push_type">
+        <item>push Type</item>
+        <item>new_task</item>
+        <item>send_task</item>
+        <item>get_task</item>
+        <item>finish_task</item>
+    </string-array>
+</resources>
