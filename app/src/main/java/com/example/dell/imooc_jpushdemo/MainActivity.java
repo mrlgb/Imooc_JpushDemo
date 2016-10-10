@@ -25,16 +25,32 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import android.widget.Button;
+import android.widget.Toast;
+
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 public class MainActivity extends AppCompatActivity {
+    //接口地址
     private final String url="http://192.168.0.124:8080/ygs/inf/pushMsg";
+    //返回的结果
     private TextView tvResult;
-    private Button btSend;
-    private Spinner mSpinner;
+    private Button btSend; //发送推送请求
+    private Spinner mSpinner; //选择推送方式
+    //推送种类
     private String pushType;
+    //spinner的适配器
     private ArrayAdapter<String> adapter;
+    //设置alias的按钮
+    private Button btSetAlias;
+    //显示用户设置的alias
+    private TextView tvAlias;
+    private String alias;
+
+    //更新UI
     private Handler handler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -50,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
         mSpinner= (Spinner) findViewById(R.id.push_type);
         tvResult= (TextView) findViewById(R.id.tv_result);
         btSend= (Button) findViewById(R.id.bt_send);
-
+        btSetAlias= (Button) findViewById(R.id.bt_set);
+        tvAlias= (TextView) findViewById(R.id.tv_alias);
         String[] strings=getResources().getStringArray(R.array.push_type);
         List<String> list=new ArrayList<>();
 
@@ -74,6 +91,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 adapterView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //设置alias
+        btSetAlias.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alias=((EditText)findViewById(R.id.et_set_alias)).getText().toString();
+                //调用SDK接口
+                JPushInterface.setAlias(getBaseContext(),alias, new TagAliasCallback() {
+                    @Override
+                    public void gotResult(int i, String s, Set<String> set) {
+                        tvAlias.setText("当前alias："+alias);
+                        Toast.makeText(MainActivity.this, "设置成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

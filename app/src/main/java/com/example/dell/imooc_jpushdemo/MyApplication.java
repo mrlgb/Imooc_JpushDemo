@@ -14,11 +14,6 @@ public class MyApplication extends android.app.Application {
         super.onCreate();
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);
-        JPushInterface.setAlias(getBaseContext(), "user1", new TagAliasCallback() {
-            @Override
-            public void gotResult(int i, String s, Set<String> set) {
 
-            }
-        });
     }
 }
