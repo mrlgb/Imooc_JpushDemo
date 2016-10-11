@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,8 +35,8 @@ import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 
 public class MainActivity extends AppCompatActivity {
-    //接口地址
-    private final String url="http://192.168.0.124:8080/ygs/inf/pushMsg";
+    //接口地址,根据本机的IP地址改动
+    private final String url="http://192.168.0.128/push/test.php";
     //返回的结果
     private TextView tvResult;
     private Button btSend; //发送推送请求
@@ -68,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         btSend= (Button) findViewById(R.id.bt_send);
         btSetAlias= (Button) findViewById(R.id.bt_set);
         tvAlias= (TextView) findViewById(R.id.tv_alias);
+        //spinner内的文字
         String[] strings=getResources().getStringArray(R.array.push_type);
         List<String> list=new ArrayList<>();
-
         for(String s:strings){
             list.add(s);
         }
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //第四步：将适配器添加到下拉列表上
         mSpinner.setAdapter(adapter);
+
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -113,43 +115,21 @@ public class MainActivity extends AppCompatActivity {
         btSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String title=((EditText)findViewById(R.id.et_title)).getText().toString();
-                String alert=((EditText)findViewById(R.id.et_alert)).getText().toString();
-                String alias=((EditText)findViewById(R.id.et_alias)).getText().toString();
-
-                JSONObject jsonObject=new JSONObject();
-                try {
-                    jsonObject.put("alias",alias);
-                    jsonObject.put("alert",alert);
-                    jsonObject.put("title",title);
-
-                    sendRequest(jsonObject);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                sendRequest();
             }
         });
     }
 
-    private void sendRequest(JSONObject jsonObject) {
+    private void sendRequest() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String title=((EditText)findViewById(R.id.et_title)).getText().toString();
-                String alert=((EditText)findViewById(R.id.et_alert)).getText().toString();
+
                 String alias=((EditText)findViewById(R.id.et_alias)).getText().toString();
-
                 try {
-
                     // 传递的数据
-                    String data = "alert=" + URLEncoder.encode(alert, "UTF-8")
-                            + "&title=" + URLEncoder.encode(title, "UTF-8")
-                            +"&alias="+URLEncoder.encode(alias,"UTF-8")
+                    String data ="&alias="+URLEncoder.encode(alias,"UTF-8")
                             +"&push_type="+URLEncoder.encode(pushType,"UTF-8");
-
-
                     URL httpUrl = new URL(url);
                     HttpURLConnection urlConnection = (HttpURLConnection) httpUrl.openConnection();
                     urlConnection.setRequestMethod("POST");
@@ -175,11 +155,10 @@ public class MainActivity extends AppCompatActivity {
                     String s;
                     while ((s = bufferedReader.readLine()) != null) {
                         sb.append(s);
+                        Log.d("111", "run: "+sb.toString());
                     }
-
                     Message msg = new Message();
                     msg.obj = sb;
-
                     handler.sendMessage(msg);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -189,6 +168,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-
 }
